@@ -173,8 +173,8 @@ RUN cd ${APP_DIR} \
     && git config --global user.email ${APP_USER}@localhost \
     && git config --global core.mergeoptions "--strategy-option=theirs --allow-unrelated-histories --no-edit" \
     && git remote add origin ${CODE_REPOSITORY} \
-    && git checkout -b main \
-    && git pull origin ${RELEASE_TAG} \
+    && git checkout -b rel-6_3 \
+    && git pull origin rel-6_3 \
     && mkdir -p ${APP_DIR}/var/article \ 
                 ${APP_DIR}/var/spool \
                 ${APP_DIR}/var/tmp \
