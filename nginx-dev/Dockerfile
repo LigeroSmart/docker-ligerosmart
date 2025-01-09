@@ -1,4 +1,4 @@
-FROM ligero/ligerosmart:base
+FROM ligero/ligerosmart:6.3-base
 
 # Packages
 RUN apt update \

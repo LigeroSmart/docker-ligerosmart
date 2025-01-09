@@ -1,4 +1,4 @@
-FROM ligero/ligerosmart:base
+FROM ligero/ligerosmart:6.3-base
 
 ENV START_WEBSERVER=0 \
     START_SCHEDULER=1
