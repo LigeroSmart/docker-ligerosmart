@@ -1,0 +1,17 @@
+#!/bin/bash
+
+BACKUP_FILE=$2
+DATABASE_NAME=$1
+
+if [[ -z "$DATABASE_NAME" ]]; then
+    echo "Usage: $0 <DATABASE_NAME> <BACKUP_FILE>" >&2
+    exit 1
+fi
+
+if [[ -z "$BACKUP_FILE" || "$BACKUP_FILE" != *.gz ]]; then
+    echo "Error: BACKUP_FILE format must be .gz" >&2
+    echo "Usage: $0 <DATABASE_NAME> <BACKUP_FILE>" >&2
+    exit 1
+fi
+
+zcat $BACKUP_FILE | mysql -p$APP_DatabasePw $DATABASE_NAME
