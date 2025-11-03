@@ -404,7 +404,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root_password
       MYSQL_DATABASE: ligerosmart
-      MYSQL_USER: ligero
+      MYSQL_USER: ligerosmart
       MYSQL_PASSWORD: senha_segura
     volumes:
       - mariadb-data:/var/lib/mysql
@@ -418,7 +418,7 @@ services:
       APP_DatabaseType: mysql
       APP_DatabaseHost: database
       APP_Database: ligerosmart
-      APP_DatabaseUser: ligero
+      APP_DatabaseUser: ligerosmart
       APP_DatabasePw: senha_segura
       START_WEBSERVER: 1
       START_SCHEDULER: 1
@@ -445,7 +445,7 @@ docker run -d \
   -e APP_DatabaseType=mysql \
   -e APP_DatabaseHost=database \
   -e APP_Database=ligerosmart \
-  -e APP_DatabaseUser=ligero \
+  -e APP_DatabaseUser=ligerosmart \
   -e APP_DatabasePw=senha_segura \
   -e START_WEBSERVER=1 \
   -e START_SCHEDULER=1 \
@@ -464,7 +464,7 @@ docker run -d \
   -e APP_DatabaseType=postgresql \
   -e APP_DatabaseHost=database \
   -e APP_Database=ligerosmart \
-  -e APP_DatabaseUser=ligero \
+  -e APP_DatabaseUser=ligerosmart \
   -e APP_DatabasePw=senha_segura \
   -e START_WEBSERVER=1 \
   -e START_SCHEDULER=1 \
@@ -517,7 +517,7 @@ environment:
   APP_DatabaseType: mysql
   APP_DatabaseHost: database
   APP_Database: ligerosmart
-  APP_DatabaseUser: ligero
+  APP_DatabaseUser: ligerosmart
   APP_DatabasePw: senha_segura
 ```
 
@@ -532,7 +532,7 @@ environment:
   APP_DatabaseType: mysql
   APP_DatabaseHost: database
   APP_Database: ligerosmart
-  APP_DatabaseUser: ligero
+  APP_DatabaseUser: ligerosmart
   APP_DatabasePw: senha_segura
 ```
 
@@ -547,7 +547,7 @@ environment:
   APP_DatabaseType: postgresql
   APP_DatabaseHost: database
   APP_Database: ligerosmart
-  APP_DatabaseUser: ligero
+  APP_DatabaseUser: ligerosmart
   APP_DatabasePw: senha_segura
 ```
 
@@ -565,7 +565,7 @@ environment:
   APP_DatabaseType: oracle
   APP_DatabaseHost: oracle.exemplo.com
   APP_Database: XE
-  APP_DatabaseUser: ligero
+  APP_DatabaseUser: ligerosmart
   APP_DatabasePw: senha_segura
 ```
 
