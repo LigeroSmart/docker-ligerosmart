@@ -6,6 +6,7 @@ RUN apt-get update \
         bind9-host \
         htop \
         iputils-ping \
+        net-tools \
         ldap-utils \
         mtr \
         ncdu \
