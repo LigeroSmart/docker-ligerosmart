@@ -399,7 +399,7 @@ Consulte o repositório de stack para exemplos completos de docker-compose:
 version: '3.8'
 
 services:
-  mariadb:
+  database:
     image: mariadb:10.3
     environment:
       MYSQL_ROOT_PASSWORD: root_password
