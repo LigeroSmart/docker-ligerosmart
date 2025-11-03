@@ -31,7 +31,7 @@ Este repositório contém as imagens Docker oficiais do LigeroSmart, projetadas 
 - ✅ **Escalabilidade Horizontal** - Separação de serviços (web, scheduler, sshd)
 - ✅ **Backup Inteligente** - Sistema completo de backup e sincronização com S3
 - ✅ **Monitoramento Integrado** - Healthchecks e integração com Zabbix
-- ✅ **Suporte Multi-Database** - MySQL/MariaDB, PostgreSQL e Oracle
+- ✅ **Suporte Multi-Database** - MariaDB (recomendado), MySQL, PostgreSQL e Oracle
 - ✅ **Desenvolvimento Facilitado** - Imagem dedicada para ambiente de desenvolvimento
 
 ---
@@ -79,9 +79,9 @@ Imagem base com todas as dependências do LigeroSmart pré-instaladas.
 **Características:**
 - 🐧 Ubuntu 20.04 LTS
 - 🐪 Perl 5 com módulos CPAN otimizados
-- 📦 Dependências para MySQL/MariaDB, PostgreSQL
+- 📦 Dependências para MariaDB, MySQL, PostgreSQL
 - 🔧 Ferramentas: git, curl, vim, AWS CLI
-
+- 📧 Sistema de e-mail via gosendmail
 **Inclui:**
 - Cache::Memcached::Fast e Redis
 - Suporte a Elasticsearch 7.x
@@ -202,7 +202,7 @@ Agente Zabbix Alpine para monitoramento de infraestrutura.
 
 **Características:**
 - 📊 Monitoramento de recursos
-- 🗄️ Clients MySQL e PostgreSQL incluídos
+- 🗄️ Clients MariaDB/MySQL e PostgreSQL incluídos
 - ✅ Healthcheck automático
 - 🔔 Alertas proativos
 
@@ -291,8 +291,8 @@ Monitoramento automático de saúde dos containers.
 
 | Variável | Padrão | Descrição |
 |----------|--------|--------|
-| `APP_DatabaseType` | `mysql` | Tipo: mysql, postgresql, oracle |
-| `APP_DatabaseHost` | - | Hostname do banco |
+| `APP_DatabaseType` | `mysql` | Tipo: mysql (para MariaDB/MySQL), postgresql, oracle |
+| `APP_DatabaseHost` | - | Hostname do banco (ex: mariadb, mysql, postgres) |
 | `APP_Database` | - | Nome do banco de dados |
 | `APP_DatabaseUser` | - | Usuário do banco |
 | `APP_DatabasePw` | - | Senha do banco |
@@ -385,7 +385,7 @@ docker run -v /caminho/backup:/app-backups/restore \
 
 - Docker Engine 20.10+
 - Docker Compose 2.0+
-- Banco de dados (MySQL 8.0+ ou PostgreSQL 12+)
+- Banco de dados (MariaDB 10.3+ recomendado ou PostgreSQL 12+)
 
 ### Configuração Básica
 
@@ -393,15 +393,78 @@ Consulte o repositório de stack para exemplos completos de docker-compose:
 
 📦 **[LigeroSmart Stack](https://github.com/LigeroSmart/ligerosmart-stack)**
 
+### Exemplo Docker Compose com MariaDB
+
+```yaml
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:10.3
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: ligerosmart
+      MYSQL_USER: ligero
+      MYSQL_PASSWORD: senha_segura
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    restart: unless-stopped
+
+  ligerosmart:
+    image: ligero/ligerosmart:nginx
+    ports:
+      - "80:80"
+    environment:
+      APP_DatabaseType: mysql
+      APP_DatabaseHost: database
+      APP_Database: ligerosmart
+      APP_DatabaseUser: ligero
+      APP_DatabasePw: senha_segura
+      START_WEBSERVER: 1
+      START_SCHEDULER: 1
+      ROOT_PASSWORD: ligero
+    volumes:
+      - ligerosmart-data:/opt/otrs
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+
+volumes:
+  mariadb-data:
+  ligerosmart-data:
+```
+
 ### Exemplo com Docker Run
+
+#### Com MariaDB (Recomendado)
 
 ```bash
 docker run -d \
   --name ligerosmart-web \
   -p 80:80 \
-  -e APP_DatabaseHost=db.exemplo.com \
+  -e APP_DatabaseType=mysql \
+  -e APP_DatabaseHost=database \
   -e APP_Database=ligerosmart \
-  -e APP_DatabaseUser=usuario \
+  -e APP_DatabaseUser=ligero \
+  -e APP_DatabasePw=senha_segura \
+  -e START_WEBSERVER=1 \
+  -e START_SCHEDULER=1 \
+  -v ligerosmart-data:/opt/otrs \
+  ligero/ligerosmart:nginx
+```
+
+> **Nota:** Use MariaDB 10.3+ para melhor compatibilidade e performance.
+
+#### Com PostgreSQL
+
+```bash
+docker run -d \
+  --name ligerosmart-web \
+  -p 80:80 \
+  -e APP_DatabaseType=postgresql \
+  -e APP_DatabaseHost=database \
+  -e APP_Database=ligerosmart \
+  -e APP_DatabaseUser=ligero \
   -e APP_DatabasePw=senha_segura \
   -e START_WEBSERVER=1 \
   -e START_SCHEDULER=1 \
@@ -445,33 +508,52 @@ Senha: ligero (padrão, alterar após primeiro login)
 
 ## 🗄️ Bancos de Dados
 
-### MySQL / MariaDB (Recomendado)
+### MariaDB (Recomendado)
+
+MariaDB é a opção recomendada para o LigeroSmart devido à sua estabilidade, performance e compatibilidade.
 
 ```yaml
 environment:
   APP_DatabaseType: mysql
-  APP_DatabaseHost: mysql
+  APP_DatabaseHost: database
   APP_Database: ligerosmart
   APP_DatabaseUser: ligero
   APP_DatabasePw: senha_segura
 ```
 
-**Versões suportadas:**
-- MySQL 8.0+
-- MariaDB 10.5+
+**Versões suportadas:** MariaDB 10.3+
+
+**Recomendação:** MariaDB 10.3 para produção
+
+### MariaDB
+
+```yaml
+environment:
+  APP_DatabaseType: mysql
+  APP_DatabaseHost: database
+  APP_Database: ligerosmart
+  APP_DatabaseUser: ligero
+  APP_DatabasePw: senha_segura
+```
+
+**Compatível com:** MariaDB 10.3+
 
 ### PostgreSQL
+
+Alternativa ao MariaDB para casos específicos.
 
 ```yaml
 environment:
   APP_DatabaseType: postgresql
-  APP_DatabaseHost: postgres
+  APP_DatabaseHost: database
   APP_Database: ligerosmart
   APP_DatabaseUser: ligero
   APP_DatabasePw: senha_segura
 ```
 
 **Versões suportadas:** PostgreSQL 12+
+
+> **Dica:** Para a maioria dos casos de uso, recomendamos MariaDB 10.3 pela sua estabilidade e compatibilidade comprovada com o LigeroSmart.
 
 ### Oracle
 
@@ -555,14 +637,13 @@ services:
 - 📖 **[Documentação Completa](https://docs.ligerosmart.org)**
 - 🐳 **[Stack de Produção](https://github.com/LigeroSmart/ligerosmart-stack)**
 - 💻 **[Código Fonte](https://github.com/LigeroSmart/ligerosmart)**
-- 🌐 **[Site Oficial](https://www.ligerosmart.com)**
+- 🌐 **[Site Oficial](https://ligerosmart.com)**
 
 ### Suporte
 
 Para questões técnicas e suporte:
 
-- 📧 **E-mail:** suporte@ligerosmart.com
-- 💬 **Comunidade:** [Forum LigeroSmart](https://forum.ligerosmart.org)
+- 💬 **Comunidade:** [Grupo do Telegram LigeroSmart](https://t.me/ligerosmart)
 - 🐛 **Issues:** [GitHub Issues](https://github.com/LigeroSmart/docker-ligerosmart/issues)
 
 ---
@@ -573,18 +654,11 @@ Para questões técnicas e suporte:
 
 1. **Altere senhas padrão** imediatamente após instalação
 2. **Use variáveis de ambiente** para credenciais (não hardcode)
-3. **Habilite HTTPS** com certificados válidos (Let's Encrypt recomendado)
+3. **Habilite HTTPS** com certificados válidos (Traefik com Let's Encrypt recomendado)
 4. **Configure firewall** para restringir acessos
 5. **Mantenha backups** regulares e testados
 6. **Atualize regularmente** as imagens Docker
 7. **Monitore logs** e configure alertas
-
-### SecureMode
-
-O LigeroSmart é iniciado com **SecureMode** ativado por padrão, bloqueando:
-- Instalação de pacotes via interface web
-- Modificação de código via interface
-- Operações administrativas sem autenticação
 
 ---
 
