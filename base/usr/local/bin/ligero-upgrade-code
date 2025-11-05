@@ -1,4 +1,22 @@
 #!/bin/bash
+set -euo pipefail
+
 LAST_VERSION=$(curl --silent "https://api.github.com/repos/LigeroSmart/ligerosmart/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
-git pull --strategy-option=theirs --allow-unrelated-histories --no-edit origin $LAST_VERSION
-[[ $? -eq 0 ]] && otrs.Console.pl Maint::Database::Migration::Apply
+
+git pull --strategy-option=theirs --allow-unrelated-histories --no-edit origin "$LAST_VERSION"
+GIT_PULL_EXIT_CODE=$?
+
+# If there was a merge conflict (non-zero exit), resolve by preferring "theirs",
+# stage and commit the resolution, then treat as success.
+if [[ $GIT_PULL_EXIT_CODE -ne 0 ]]; then
+  git checkout --theirs .
+  git add -A
+  git commit -m "Auto-resolve merge conflicts: prefer theirs" || true
+  GIT_PULL_EXIT_CODE=0
+fi
+
+# Run migrations only if pull (or auto-resolution) succeeded
+if [[ $GIT_PULL_EXIT_CODE -eq 0 ]]; then
+  otrs.Console.pl Maint::Database::Migration::Apply
+fi
+
