@@ -5,6 +5,7 @@ RUN apt update \
     && apt install -y \
         nginx \
         build-essential \
+        strace \
         libexpat1-dev \
         libssl-dev \
         libmysqlclient-dev \
