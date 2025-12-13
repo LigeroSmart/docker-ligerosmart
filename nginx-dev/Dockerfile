@@ -29,6 +29,7 @@ RUN cpanm --sudo --quiet --notest \
 # include files
 COPY etc /etc
 COPY var /var
+COPY usr /usr
 COPY app.psgi /
 COPY app-init.d /app-init.d
 COPY app-dev-run.sh /app-dev-run.sh
