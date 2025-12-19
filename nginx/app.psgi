@@ -66,7 +66,12 @@ my $App = CGI::Emulate::PSGI->handler(
         }
 
         my ( $HandleScript ) = $ENV{PATH_INFO} =~ m{/([A-Za-z\-_]+\.pl)};    ## no critic
- 
+
+        # Check for XSS in PATH_INFO
+        if ( $HandleScript =~ /[<>"'`\x00-\x1F\x7F]/smx ) {
+            $HandleScript = 'index.pl';
+        }
+
         # Fallback to agent login if we could not determine handle...i
         if ( !defined $HandleScript || !-e "$Bin/$HandleScript" ) {
             $HandleScript = 'index.pl';                                   ## no critic
