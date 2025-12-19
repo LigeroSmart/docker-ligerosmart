@@ -74,7 +74,8 @@ my $App = CGI::Emulate::PSGI->handler(
 
         # Fallback to agent login if we could not determine handle...i
         if ( !defined $HandleScript || !-e "$Bin/$HandleScript" ) {
-            $HandleScript = 'index.pl';                                   ## no critic
+            $HandleScript = 'index.pl'; ## no critic
+            $ENV{PATH_INFO} = 'index.pl'; ## no critic
         }
 
         eval {
