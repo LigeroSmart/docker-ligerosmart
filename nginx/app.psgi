@@ -76,7 +76,7 @@ my $App = CGI::Emulate::PSGI->handler(
         }
 
         # Populate SCRIPT_NAME as OTRS needs it in some places.
-        $ENV{SCRIPT_NAME} = $ENV{PATH_INFO};
+        $ENV{SCRIPT_NAME} = $HandleScript;
 
         eval {
 
