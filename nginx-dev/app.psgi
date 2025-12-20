@@ -53,9 +53,6 @@ my $App = CGI::Emulate::PSGI->handler(
         # Cleanup values from previous requests.
         CGI::initialize_globals();
 
-        # Populate SCRIPT_NAME as OTRS needs it in some places.
-        $ENV{SCRIPT_NAME} = $ENV{PATH_INFO};
-
         # set RemoteAddr behind proxy
         if ( $ENV{HTTP_X_REAL_IP} ) {
             $ENV{REMOTE_ADDR} = $ENV{HTTP_X_REAL_IP};
@@ -76,9 +73,12 @@ my $App = CGI::Emulate::PSGI->handler(
  
         # Fallback to agent login if we could not determine handle...i
         if ( !defined $HandleScript || !-e "$Bin/$HandleScript" ) {
-            $HandleScript = 'index.pl';                                   ## no critic
+            $HandleScript = "$Bin/index.pl";                                   ## no critic
         }
 
+        # Populate SCRIPT_NAME as OTRS needs it in some places.
+        $ENV{SCRIPT_NAME} = $ENV{PATH_INFO};
+        
         eval {
 
             # Reload files in @INC that have changed since the last request.
