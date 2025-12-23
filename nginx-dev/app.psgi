@@ -39,12 +39,24 @@ use CGI;
 use CGI::Emulate::PSGI;
 use Module::Refresh;
 use Plack::Builder;
-use Plack::Request;
 
 # Workaround: some parts of OTRS use exit to interrupt the control flow.
 #   This would kill the Plack server, so just use die instead.
 BEGIN {
     *CORE::GLOBAL::exit = sub { die "exit called\n"; };
+}
+
+# Print 404 error page
+sub Print404Error {
+    print "Status: 404 Not Found\r\n";
+    print "Content-Type: text/html\r\n\r\n";
+    if ( -e '/var/www/html/404.html' ) {
+        open my $fh, '<', '/var/www/html/404.html';
+        print <$fh>;
+        close $fh;
+    } else {
+        print '<html><body><h1>404 Not Found</h1><p>The requested resource was not found.</p></body></html>';
+    }
 }
 
 my $App = CGI::Emulate::PSGI->handler(
@@ -65,20 +77,26 @@ my $App = CGI::Emulate::PSGI->handler(
 
         my ( $HandleScript ) = $ENV{PATH_INFO} =~ m{/([A-Za-z\-_]+\.pl)};    ## no critic
 
+        # If HandleScript is not defined, use index.pl as default
+        if ( !defined $HandleScript ) {
+            $HandleScript = 'index.pl';
+        }
+
         # Check for XSS in PATH_INFO
         if ( $HandleScript =~ /[<>"'`\x00-\x1F\x7F]/smx ) {
-            $HandleScript = 'index.pl'; ## no critic
-            $ENV{PATH_INFO} = 'index.pl'; ## no critic
+            Print404Error();
+            return;
         }
- 
-        # Fallback to agent login if we could not determine handle...i
-        if ( !defined $HandleScript || !-e "$Bin/$HandleScript" ) {
-            $HandleScript = "$Bin/index.pl";                                   ## no critic
+
+        # If HandleScript file does not exist, return 404
+        if ( !-e "$Bin/$HandleScript" ) {
+            Print404Error();
+            return;
         }
 
         # Populate SCRIPT_NAME as OTRS needs it in some places.
-        $ENV{SCRIPT_NAME} = $HandleScript;
-        
+        $ENV{SCRIPT_NAME} = $ENV{PATH_INFO};
+
         eval {
 
             # Reload files in @INC that have changed since the last request.
@@ -138,6 +156,7 @@ builder {
       expires => 'access plus 7 days';
     enable "Plack::Middleware::ErrorDocument",
         403 => '/var/www/html/403.html',
+        404 => '/var/www/html/404.html',
         500 => '/var/www/html/50x.html',
         502 => '/var/www/html/50x.html';
     $App;
