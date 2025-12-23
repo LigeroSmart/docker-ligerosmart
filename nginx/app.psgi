@@ -46,6 +46,19 @@ BEGIN {
     *CORE::GLOBAL::exit = sub { die "exit called\n"; };
 }
 
+# Print 404 error page
+sub Print404Error {
+    print "Status: 404 Not Found\r\n";
+    print "Content-Type: text/html\r\n\r\n";
+    if ( -e '/var/www/html/404.html' ) {
+        open my $fh, '<', '/var/www/html/404.html';
+        print <$fh>;
+        close $fh;
+    } else {
+        print '<html><body><h1>404 Not Found</h1><p>The requested resource was not found.</p></body></html>';
+    }
+}
+
 my $App = CGI::Emulate::PSGI->handler(
     sub {
 
@@ -64,17 +77,20 @@ my $App = CGI::Emulate::PSGI->handler(
 
         my ( $HandleScript ) = $ENV{PATH_INFO} =~ m{/([A-Za-z\-_]+\.pl)};    ## no critic
 
-        # Check for XSS in PATH_INFO or if HandleScript is not defined or not a valid file
-        if ( ($HandleScript && $HandleScript =~ /[<>"'`\x00-\x1F\x7F]/smx) || !defined $HandleScript || !-e "$Bin/$HandleScript" ) {
-            print "Status: 404 Not Found\r\n";
-            print "Content-Type: text/html\r\n\r\n";
-            if ( -e '/var/www/html/404.html' ) {
-                open my $fh, '<', '/var/www/html/404.html';
-                print <$fh>;
-                close $fh;
-            } else {
-                print '<html><body><h1>404 Not Found</h1><p>The requested script was not found.</p></body></html>';
-            }
+        # Check for XSS in PATH_INFO
+        if ( $HandleScript && $HandleScript =~ /[<>"'`\x00-\x1F\x7F]/smx ) {
+            Print404Error();
+            return;
+        }
+
+        # If HandleScript is not defined, use index.pl as default
+        if ( !defined $HandleScript ) {
+            $HandleScript = 'index.pl';
+        }
+
+        # If HandleScript file does not exist, return 404
+        if ( !-e "$Bin/$HandleScript" ) {
+            Print404Error();
             return;
         }
 
