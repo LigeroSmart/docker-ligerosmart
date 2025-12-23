@@ -75,17 +75,17 @@ my $App = CGI::Emulate::PSGI->handler(
             #($ENV{REMOTE_ADDR}) = split /\s*,/, $ENV{HTTP_X_FORWARDED_FOR};
         }
 
+        # Check for XSS in PATH_INFO
+        if ( $ENV{PATH_INFO} =~ /[<>"'`\x00-\x1F\x7F]/smx ) {
+            Print404Error();
+            return;
+        }
+
         my ( $HandleScript ) = $ENV{PATH_INFO} =~ m{/([A-Za-z\-_]+\.pl)};    ## no critic
 
         # If HandleScript is not defined, use index.pl as default
         if ( !defined $HandleScript ) {
             $HandleScript = 'index.pl';
-        }
-
-        # Check for XSS in PATH_INFO
-        if ( $HandleScript =~ /[<>"'`\x00-\x1F\x7F]/smx ) {
-            Print404Error();
-            return;
         }
 
         # If HandleScript file does not exist, return 404
