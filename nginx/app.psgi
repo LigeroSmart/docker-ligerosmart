@@ -64,19 +64,22 @@ my $App = CGI::Emulate::PSGI->handler(
 
         my ( $HandleScript ) = $ENV{PATH_INFO} =~ m{/([A-Za-z\-_]+\.pl)};    ## no critic
 
-        # Check for XSS in PATH_INFO
-        if ( $HandleScript =~ /[<>"'`\x00-\x1F\x7F]/smx ) {
-            $HandleScript = 'index.pl';
-        }
-
-        # Fallback to agent login if we could not determine handle...i
-        if ( !defined $HandleScript || !-e "$Bin/$HandleScript" ) {
-            $HandleScript = 'index.pl'; ## no critic
-            $ENV{PATH_INFO} = 'index.pl'; ## no critic
+        # Check for XSS in PATH_INFO or if HandleScript is not defined or not a valid file
+        if ( ($HandleScript && $HandleScript =~ /[<>"'`\x00-\x1F\x7F]/smx) || !defined $HandleScript || !-e "$Bin/$HandleScript" ) {
+            print "Status: 404 Not Found\r\n";
+            print "Content-Type: text/html\r\n\r\n";
+            if ( -e '/var/www/html/404.html' ) {
+                open my $fh, '<', '/var/www/html/404.html';
+                print <$fh>;
+                close $fh;
+            } else {
+                print '<html><body><h1>404 Not Found</h1><p>The requested script was not found.</p></body></html>';
+            }
+            return;
         }
 
         # Populate SCRIPT_NAME as OTRS needs it in some places.
-        $ENV{SCRIPT_NAME} = $HandleScript;
+        $ENV{SCRIPT_NAME} = $ENV{PATH_INFO};
 
         eval {
 
@@ -134,6 +137,7 @@ builder {
         pass_trough => 0;
     enable "Plack::Middleware::ErrorDocument",
         403 => '/var/www/html/403.html',
+        404 => '/var/www/html/404.html',
         500 => '/var/www/html/50x.html',
         502 => '/var/www/html/50x.html';
     $App;
