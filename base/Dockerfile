@@ -138,6 +138,7 @@ RUN apt update \
     && cpanm --sudo --quiet --notest HTTP::Server::Brick \
     && cpanm --sudo --quiet --notest JSON::Path \
     && cpanm --sudo --quiet --notest Plack \
+    && cpanm --sudo --quiet --notest Plack::Middleware::Expires \
     && cpanm --sudo --quiet --notest Search::Elasticsearch@7.30 \
     && cpanm --sudo --quiet --notest HTTP::DAV \
     && cpanm --sudo --quiet --notest MIME::Words \
