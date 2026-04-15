@@ -1,5 +1,3 @@
-FROM fasibio/docker-gosendmail:latest AS gosendmail
-
 FROM ubuntu:20.04 AS base
 
 ARG RELEASE_TAG
@@ -196,6 +194,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
     && sudo ./aws/install \
     && rm -rf aws/ awscliv2.zip
 
-COPY --from=gosendmail /bin/gosendmail /usr/sbin/sendmail
+RUN chmod +x /usr/local/bin/sendmail2log \
+    && ln -sf /usr/local/bin/sendmail2log /usr/sbin/sendmail
 
 CMD /app-run.sh
