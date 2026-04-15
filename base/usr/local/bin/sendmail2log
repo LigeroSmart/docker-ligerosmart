@@ -14,5 +14,4 @@ done
 
 printf "%s [sendmail] To=%s Subject=%s\n" "$ts" "${to:-unknown}" "${subject:-none}"
 cat
-printf "\n----- end mail output -----\n\n"
 exit 0
