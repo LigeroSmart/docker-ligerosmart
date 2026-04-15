@@ -1,6 +1,5 @@
 #!/bin/sh
 # Redirect sendmail output to container stdout
-out="/proc/1/fd/1"
 ts="$(date)"
 to=""
 subject=""
@@ -13,7 +12,7 @@ while IFS= read -r line; do
   esac
 done
 
-printf "%s [sendmail] To=%s Subject=%s\n" "$ts" "${to:-unknown}" "${subject:-none}" >> "$out" 2>&1
-cat >> "$out" 2>&1
-printf "\n----- end mail output -----\n\n" >> "$out" 2>&1
+printf "%s [sendmail] To=%s Subject=%s\n" "$ts" "${to:-unknown}" "${subject:-none}"
+cat
+printf "\n----- end mail output -----\n\n"
 exit 0
