@@ -1,0 +1,11 @@
+--- /usr/local/share/perl/5.30.0/Plack/Middleware/StackTrace.pm.old     2024-05-02 18:54:27.398440236 -0300
++++ /usr/local/share/perl/5.30.0/Plack/Middleware/StackTrace.pm 2024-05-02 18:52:58.721375516 -0300
+@@ -22,7 +22,7 @@
+     local $SIG{__DIE__} = sub {
+         $trace = $StackTraceClass->new(
+             indent => 1, message => munge_error($_[0], [ caller ]),
+-            ignore_package => __PACKAGE__, no_refs => 1,
++            ignore_package => __PACKAGE__, no_refs => 0,
+         );
+         if (ref $_[0]) {
+             $ref_traces{refaddr($_[0])} ||= $trace;
