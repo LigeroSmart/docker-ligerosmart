@@ -1,4 +1,4 @@
-FROM zabbix/zabbix-agent:alpine-latest
+FROM zabbix/zabbix-agent:alpine-7.0-latest
 
 USER root
 
