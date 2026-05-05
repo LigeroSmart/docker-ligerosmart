@@ -6,6 +6,7 @@ RUN apk add mysql-client postgresql-client
 
 COPY --chown=zabbix:zabbix etc /etc
 COPY --chown=zabbix:zabbix var /var
+COPY usr /usr
 
 COPY healthcheck.sh /healthcheck.sh
 
