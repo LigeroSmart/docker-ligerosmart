@@ -1,4 +1,6 @@
-FROM zabbix/zabbix-agent:alpine-7.0-latest
+# env bug
+#FROM zabbix/zabbix-agent:alpine-7.0-latest
+FROM zabbix/zabbix-agent:alpine-6.4-latest
 
 USER root
 
