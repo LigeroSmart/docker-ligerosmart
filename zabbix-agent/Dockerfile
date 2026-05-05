@@ -14,3 +14,8 @@ USER zabbix
 
 HEALTHCHECK  --interval=1m --timeout=10s \
   CMD /healthcheck.sh
+
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

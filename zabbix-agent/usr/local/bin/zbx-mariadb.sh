@@ -4,10 +4,10 @@
 set -euo pipefail
 
 # Config (ou usar /root/.my.cnf)
-MYSQL_HOST="${MYSQL_HOST}"
-MYSQL_USER="${MYSQL_USER}"
+MYSQL_HOST="${MYSQL_HOST:-database}"
+MYSQL_USER="${MYSQL_USER:-root}"
 MYSQL_PASSWORD="${MYSQL_PASSWORD}"
-MYSQL_DATABASE="${MYSQL_DATABASE}"
+MYSQL_DATABASE="${MYSQL_DATABASE:-ligerosmart}"
 
 QUERY="$1"
 
