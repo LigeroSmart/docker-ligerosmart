@@ -64,4 +64,4 @@ if [ "$#" -gt 0 ]; then
   exec "$@"
 fi
 
-exec /usr/sbin/zabbix_agentd -f -c /etc/zabbix/zabbix_agentd.conf
+exec /usr/sbin/zabbix_agentd --foreground -c /etc/zabbix/zabbix_agentd.conf

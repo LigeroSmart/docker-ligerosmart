@@ -17,3 +17,5 @@ HEALTHCHECK  --interval=1m --timeout=10s \
   CMD /healthcheck.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+CMD [ "/usr/sbin/zabbix_agentd", "--foreground", "-c", "/etc/zabbix/zabbix_agentd.conf" ]
