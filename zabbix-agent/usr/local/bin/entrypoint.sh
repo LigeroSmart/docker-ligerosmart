@@ -22,7 +22,7 @@ umask 077
   echo "[client]"
   echo "host=${MYSQL_HOST}"
   echo "user=${MYSQL_USER}"
-  echo "password=${MYSQL_PASSWORD}"
+  echo "password=\"${MYSQL_PASSWORD}\""
   echo "database=${MYSQL_DATABASE}"
   echo "port=${MYSQL_PORT}"
 
