@@ -610,6 +610,29 @@ services:
       ZBX_SERVER_HOST: zabbix.exemplo.com
 ```
 
+#### Limite de horas do `count_scheduler_task_old`
+
+Os itens `ligerosmart.count_scheduler_task_old` (MariaDB) e
+`ligerosmart.pg.count_scheduler_task_old` (PostgreSQL) contam as tasks do scheduler mais
+antigas que N horas. O N vem do parâmetro da chave do item — inteiro, **default 4**
+quando a chave vem sem parâmetro:
+
+| Chave do item | Conta tasks com mais de |
+|---|---|
+| `ligerosmart.count_scheduler_task_old` | 4 horas |
+| `ligerosmart.count_scheduler_task_old[12]` | 12 horas |
+
+Para ajustar por cliente sem tocar na stack dele, use uma macro no Zabbix:
+
+1. No template, crie a macro `{$SCHEDULER_TASK_OLD_HOURS}` com valor `4`.
+2. Troque a chave do item para
+   `ligerosmart.count_scheduler_task_old[{$SCHEDULER_TASK_OLD_HOURS}]`.
+3. No host do cliente, sobrescreva a macro com o valor desejado.
+
+Crie a macro antes de trocar a chave: sem ela, o Zabbix envia o texto literal `{$...}` e
+o item fica "não suportado". Um valor que não seja inteiro também deixa o item "não
+suportado", com a mensagem `horas invalidas: <valor>`.
+
 ### MailCatcher (Dev)
 
 Ambiente de desenvolvimento com captura de e-mails.
